@@ -54,7 +54,7 @@ public class  MenuBrowser {
         try {
             CuisineType cuisineType = CuisineType.valueOf(cuisineTypeString.toUpperCase());
             service.findRestaurantByType(cuisineType);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | SQLException e) {
             System.out.println("Invalid Cuisine Type");
         }
     }
@@ -71,7 +71,7 @@ public class  MenuBrowser {
         service.findRestaurantByName(name);
     }
 
-    private void findAllActivateRestaurants(){
+    private void findAllActivateRestaurants() throws SQLException {
         service.findAllActiveRestaurant();
     }
 

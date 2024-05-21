@@ -10,11 +10,11 @@ public interface UserRestaurantRepository {
 
         public List<Restaurant> searchByLocation(String location) throws SQLException;
 
-        public List<Restaurant> findRestaurantByName(String name);
+        public List<Restaurant> findRestaurantByName(String name) throws SQLException;
 
-         public List<Restaurant> findRestaurantByType(CuisineType type);
+         public List<Restaurant> findRestaurantByType(CuisineType type) throws SQLException;
 
-         public List<Restaurant> findAllActiveRestaurant();
+         public List<Restaurant> findAllActiveRestaurant() throws SQLException;
 
          public List<Restaurant> findAllDeactivatedRestaurant();
 

@@ -32,28 +32,43 @@ public class UserRestaurantRepositoryImpl implements UserRestaurantRepository{
         }
     }
 
-    public List<Restaurant> findRestaurantByName(String name) {
-        return centralRepository.getRestaurants().values().stream()
-                .filter(restaurant -> restaurant.getName().equalsIgnoreCase(name))
-                .collect(Collectors.toList());
+    public List<Restaurant> findRestaurantByName(String name) throws SQLException {
+        Connection connection=JdbcConnectionUtil.getConnection();
+        String query="select * from restaurant where name like ?";
+        PreparedStatement statement=connection.prepareStatement(query);
+        statement.setString(1,name);
+        ResultSet set = statement.executeQuery();
+        return restaurantsFromResultset(set);
     }
 
-    public List<Restaurant> findRestaurantByType(CuisineType type) {
-        return centralRepository.getRestaurants().values().stream()
-                .filter(restaurant -> restaurant.getCuisineType() == type)
-                .collect(Collectors.toList());
+    public List<Restaurant> findRestaurantByType(CuisineType type) throws SQLException {
+       Connection connection=JdbcConnectionUtil.getConnection();
+       String query= "select * from restaurant where Cuisine_Type like ?";
+       PreparedStatement statement= connection.prepareStatement(query);
+       statement.setString(1,String.valueOf(type));
+       ResultSet set= statement.executeQuery();
+       return restaurantsFromResultset(set);
     }
 
-    public List<Restaurant> findAllActiveRestaurant() {
-        return centralRepository.getRestaurants().values().stream()
-                .filter(Restaurant::isActive)
-                .collect(Collectors.toList());
+    public List<Restaurant> findAllActiveRestaurant() throws SQLException {
+        Connection connection=JdbcConnectionUtil.getConnection();
+        String query="select * from restaurant where isActive is true";
+        PreparedStatement statement= connection.prepareStatement(query);
+        ResultSet set= statement.executeQuery();
+        return restaurantsFromResultset(set);
     }
 
     public List<Restaurant> findAllDeactivatedRestaurant() {
-        return centralRepository.getRestaurants().values().stream()
-                .filter(restaurant -> !restaurant.isActive())
-                .collect(Collectors.toList());
+        try {
+            Connection connection=JdbcConnectionUtil.getConnection();
+            String query="select * from restaurant where isActive is false";
+            PreparedStatement statement=connection.prepareStatement(query);
+            ResultSet set=statement.executeQuery();
+            return restaurantsFromResultset(set);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     private List<Restaurant> restaurantsFromResultset(ResultSet resultSet) throws SQLException {
@@ -95,11 +110,11 @@ public class UserRestaurantRepositoryImpl implements UserRestaurantRepository{
             double price=res.getDouble("Price");
             String menutype=res.getString("menu_type");
             double calorie=res.getDouble("calorie_count");
-            if(menutype.equalsIgnoreCase("NON_VEG")){
+            if("NON_VEG".equalsIgnoreCase(menutype)){
                 type= ItemType.NON_VEG;
-            } else if (menutype.equalsIgnoreCase("VEG")) {
+            } else if ("VEG".equalsIgnoreCase(menutype)) {
                 type=ItemType.VEG;
-            } else if (menutype.equalsIgnoreCase("VEGAN")) {
+            } else if ("VEGAN".equalsIgnoreCase(menutype)) {
                 type=ItemType.VEGAN;
             }
             item1=new MenuItem(s,price,type,calorie);

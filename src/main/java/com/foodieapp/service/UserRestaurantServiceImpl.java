@@ -34,7 +34,12 @@ public class UserRestaurantServiceImpl implements UserRestaurantService{
     }
 
     public void findRestaurantByName(String name) {
-        List<Restaurant> restaurants = userRestaurantRepository.findRestaurantByName(name);
+        List<Restaurant> restaurants = null;
+        try {
+            restaurants = userRestaurantRepository.findRestaurantByName(name);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         if (!restaurants.isEmpty()) {
             displayRestaurants(restaurants);
         } else {
@@ -42,7 +47,7 @@ public class UserRestaurantServiceImpl implements UserRestaurantService{
         }
     }
 
-    public void findRestaurantByType(CuisineType type) {
+    public void findRestaurantByType(CuisineType type) throws SQLException {
         List<Restaurant> restaurants = userRestaurantRepository.findRestaurantByType(type);
         if (!restaurants.isEmpty()) {
             displayRestaurants(restaurants);
@@ -51,7 +56,7 @@ public class UserRestaurantServiceImpl implements UserRestaurantService{
         }
     }
 
-    public List<Restaurant> findAllActiveRestaurant() {
+    public List<Restaurant> findAllActiveRestaurant() throws SQLException {
         List<Restaurant> activeRestaurants = userRestaurantRepository.findAllActiveRestaurant();
         if (!activeRestaurants.isEmpty()) {
             displayRestaurants(activeRestaurants);

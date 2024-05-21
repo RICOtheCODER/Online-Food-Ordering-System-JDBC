@@ -11,9 +11,9 @@ public interface UserRestaurantService {
 
     public void findRestaurantByName(String name);
 //
-    public void findRestaurantByType(CuisineType type);
+    public void findRestaurantByType(CuisineType type) throws SQLException;
 
-    public List<Restaurant> findAllActiveRestaurant();
+    public List<Restaurant> findAllActiveRestaurant() throws SQLException;
 
     public List<Restaurant> findAllDeactivatedRestaurant();
 }
