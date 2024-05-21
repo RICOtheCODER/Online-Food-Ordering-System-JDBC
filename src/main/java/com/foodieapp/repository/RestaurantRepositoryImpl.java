@@ -100,8 +100,36 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
         return getRestaurantFromResult(resultSet);
     }
 
-    public Restaurant getRestaurantById(long restaurantId) {
-        return centralRepository.getRestaurants().get(restaurantId);
+    public Restaurant getRestaurantById(long restaurantId) throws SQLException {
+        Connection connection=JdbcConnectionUtil.getConnection();
+        String query = "select * from restaurant where restaurant_id= ?";
+        PreparedStatement statement=connection.prepareStatement(query);
+        statement.setInt(1,(int) restaurantId);
+        ResultSet resultSet=statement.executeQuery();
+        Restaurant rest1=null;
+        while (resultSet.next()){
+        String type = resultSet.getString("cuisine_Type"); // Assuming the column is named 'type'
+
+        Restaurant restaurant;
+
+        if ("FAST_FOOD_RESTAURANT".equalsIgnoreCase(type)) {
+            restaurant = new FastFoodRestaurant();
+        } else if ("FINE_DINING_RESTAURANT".equalsIgnoreCase(type)) {
+            restaurant = new FineDiningRestaurant();
+        } else {
+            throw new IllegalArgumentException("Unknown restaurant type: " + type);
+        }
+            restaurant.setRestaurantId(resultSet.getInt("restaurant_id"));
+            restaurant.setName(resultSet.getString("Name"));
+            restaurant.setCuisineType(CuisineType.valueOf(resultSet.getString("Cuisine_Type")));
+            restaurant.setLocation(resultSet.getString("Location"));
+            restaurant.setOpeningTime(resultSet.getTime("openingTime").toLocalTime());
+            restaurant.setClosingTime(resultSet.getTime("closingTime").toLocalTime());
+            restaurant.setMenuItems(getMenuItemsByRestaurantId((int) restaurant.getRestaurantId()));
+            restaurant.setActive(resultSet.getBoolean("isActive"));
+            rest1=restaurant;
+        }
+        return rest1;
     }
 
     public void updateRestaurant(Restaurant restaurant) {
@@ -139,24 +167,92 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
     }
 
     @Override
-    public void addCustomer(Customer customer) {
-       
+    public void addCustomer(Customer customer) throws SQLException {
+       Connection connection =JdbcConnectionUtil.getConnection();
+       String query = "insert into customer(cust_name,cust_contactNo,cust_location)\n" +
+               "values (?,?,?)";
+       PreparedStatement statement=connection.prepareStatement(query);
+       statement.setString(1, customer.getName());
+       statement.setString(2, customer.getPhoneNo());
+       statement.setString(3, customer.getLocation());
+       int rowCount= statement.executeUpdate();
+       if(rowCount==0){
+           throw new RuntimeException("Customer Insertion Failed ");
+       }
+    JdbcConnectionUtil.closeConnection();
     }
 
+//    private List<Restaurant> getRestaurantFromResult(ResultSet resultSet) throws SQLException {
+//    List<Restaurant> restaurantList=new ArrayList<>();
+//    Restaurant restaurant=null;
+//    while (resultSet.next()){
+//        restaurant=new FastFoodRestaurant();
+//       restaurant.setRestaurantId(resultSet.getInt("restaurant_id"));
+//       restaurant.setName(resultSet.getString("Name"));
+//       restaurant.setCuisineType(CuisineType.valueOf(resultSet.getString("Cuisine_Type")));
+//       restaurant.setLocation(resultSet.getString("Location"));
+//       restaurant.setOpeningTime(resultSet.getTime("openingTime").toLocalTime());
+//       restaurant.setClosingTime(resultSet.getTime("closingTime").toLocalTime());
+//       restaurantList.add(restaurant);
+//    }
+//    return restaurantList;
+//    }
     private List<Restaurant> getRestaurantFromResult(ResultSet resultSet) throws SQLException {
-    List<Restaurant> restaurantList=new ArrayList<>();
-    Restaurant restaurant=null;
-    while (resultSet.next()){
-        restaurant=new FastFoodRestaurant();
-       restaurant.setRestaurantId(resultSet.getInt("restaurant_id"));
-       restaurant.setName(resultSet.getString("Name"));
-       restaurant.setCuisineType(CuisineType.valueOf(resultSet.getString("Cuisine_Type")));
-       restaurant.setLocation(resultSet.getString("Location"));
-       restaurant.setOpeningTime(resultSet.getTime("openingTime").toLocalTime());
-       restaurant.setClosingTime(resultSet.getTime("closingTime").toLocalTime());
-       restaurantList.add(restaurant);
+        List<Restaurant> restaurantList = new ArrayList<>();
+        while (resultSet.next()) {
+            // Get the type of restaurant from the result set
+            String type = resultSet.getString("cuisine_Type"); // Assuming the column is named 'type'
+
+            Restaurant restaurant;
+
+            if ("FAST_FOOD_RESTAURANT".equalsIgnoreCase(type)) {
+                restaurant = new FastFoodRestaurant();
+            } else if ("FINE_DINING_RESTAURANT".equalsIgnoreCase(type)) {
+                restaurant = new FineDiningRestaurant();
+            } else {
+                throw new IllegalArgumentException("Unknown restaurant type: " + type);
+            }
+
+            // Set the common properties of Restaurant
+            restaurant.setRestaurantId(resultSet.getInt("restaurant_id"));
+            restaurant.setName(resultSet.getString("Name"));
+            restaurant.setCuisineType(CuisineType.valueOf(resultSet.getString("Cuisine_Type")));
+            restaurant.setLocation(resultSet.getString("Location"));
+            restaurant.setOpeningTime(resultSet.getTime("openingTime").toLocalTime());
+            restaurant.setClosingTime(resultSet.getTime("closingTime").toLocalTime());
+            restaurant.setMenuItems(getMenuItemsByRestaurantId((int) restaurant.getRestaurantId()));
+            restaurant.setActive(resultSet.getBoolean("isActive"));
+
+            restaurantList.add(restaurant);
+        }
+
+        return restaurantList;
     }
-    return restaurantList;
+    private List<MenuItem> getMenuItemsByRestaurantId(int restaurantId) throws SQLException {
+        List<MenuItem> item=new ArrayList<>();
+        MenuItem item1;
+        ItemType type=null;
+        Connection connection=JdbcConnectionUtil.getConnection();
+        String query="select Name,Price,menu_type,calorie_count from menuitems where restaurant_Id = ?";
+        PreparedStatement statement= connection.prepareStatement(query);
+        statement.setInt(1,restaurantId);
+        ResultSet res=statement.executeQuery();
+        while (res.next()){
+            String s=res.getString("Name");
+            double price=res.getDouble("Price");
+            String menutype=res.getString("menu_type");
+            double calorie=res.getDouble("calorie_count");
+            if(menutype.equalsIgnoreCase("NON_VEG")){
+                type=ItemType.NON_VEG;
+            } else if (menutype.equalsIgnoreCase("VEG")) {
+                type=ItemType.VEG;
+            } else if (menutype.equalsIgnoreCase("VEGAN")) {
+                type=ItemType.VEGAN;
+            }
+            item1=new MenuItem(s,price,type,calorie);
+            item.add(item1);
+        }
+        return item;
     }
 
 }

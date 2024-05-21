@@ -1,6 +1,7 @@
 import com.foodieapp.repository.*;
 import com.foodieapp.service.*;
 
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class UserController {
@@ -13,7 +14,7 @@ public class UserController {
         browser = new MenuBrowser(userRestaurantService);
     }
 
-    public void start() {
+    public void start() throws SQLException {
         while (true) {
             System.out.println("====Welcome to User====");
             System.out.println("1.Browse Menus");

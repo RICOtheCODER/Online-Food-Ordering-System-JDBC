@@ -85,7 +85,7 @@ public class RestaurantServiceImpl implements RestaurantService {
         }
     }
 
-    public void updateRestaurant(Restaurant updatedRestaurant) {
+    public void updateRestaurant(Restaurant updatedRestaurant) throws SQLException {
         Scanner sc = new Scanner(System.in);
 
         System.out.println("Enter Restaurant ID to update: ");
@@ -197,6 +197,29 @@ public class RestaurantServiceImpl implements RestaurantService {
         //restaurantRepository.updateRestaurant(restaurant);
         restaurantRepository.deactivateRestaurant(restaurantID);
         System.out.println("Restaurant deactivated successfully!");
+    }
+
+    @Override
+    public void getRestaurantByID(int rest_id) throws SQLException {
+        Restaurant restaurant=restaurantRepository.getRestaurantById(rest_id);
+        System.out.println(restaurant);
+    }
+
+    @Override
+    public void addCustomer(Customer customer) throws SQLException {
+        System.out.println("Enter Name of Customer : ");
+        String name= sc.next()+sc.nextLine();
+        System.out.println("Enter Phone number : ");
+        String phNo= sc.next()+sc.nextLine();
+        System.out.println("Enter Location : ");
+        String location= sc.nextLine();
+        customer=new Customer(name,phNo,location);
+        customer.setName(name);
+        customer.setPhoneNo(phNo);
+        customer.setLocation(location);
+        restaurantRepository.addCustomer(customer);
+        System.out.println("Customer Added");
+
     }
 
 }

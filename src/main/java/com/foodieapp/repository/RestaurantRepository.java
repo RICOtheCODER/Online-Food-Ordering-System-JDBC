@@ -16,7 +16,7 @@ public interface RestaurantRepository {
 
         public List<Restaurant> getAllRestaurants() throws SQLException; //left
 
-        public Restaurant getRestaurantById(long restaurantId); //left
+        public Restaurant getRestaurantById(long restaurantId) throws SQLException; //left
 
 
         public void updateRestaurant(Restaurant restaurant); //left
@@ -24,7 +24,7 @@ public interface RestaurantRepository {
         void activateRestaurant(long restaurantID) throws SQLException;
         void deactivateRestaurant(long restaurantID) throws SQLException;
 
-        public void addCustomer(Customer customer);
+        public void addCustomer(Customer customer) throws SQLException;
 
 
 }

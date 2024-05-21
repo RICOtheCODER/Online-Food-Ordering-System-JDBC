@@ -3,11 +3,12 @@ package com.foodieapp.repository;
 import com.foodieapp.model.CuisineType;
 import com.foodieapp.model.Restaurant;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public interface UserRestaurantRepository {
 
-        public List<Restaurant> searchByLocation(String location);
+        public List<Restaurant> searchByLocation(String location) throws SQLException;
 
         public List<Restaurant> findRestaurantByName(String name);
 

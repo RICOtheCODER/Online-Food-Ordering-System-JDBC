@@ -2,6 +2,8 @@ package com.foodieapp.service;
 import com.foodieapp.model.CuisineType;
 import com.foodieapp.model.Restaurant;
 import com.foodieapp.repository.UserRestaurantRepository;
+
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -22,7 +24,7 @@ public class UserRestaurantServiceImpl implements UserRestaurantService{
         }
     }
 
-    public void findRestaurantByLocation(String location) {
+    public void findRestaurantByLocation(String location) throws SQLException {
         List<Restaurant> restaurants = userRestaurantRepository.searchByLocation(location);
         if (!restaurants.isEmpty()) {
             displayRestaurants(restaurants);

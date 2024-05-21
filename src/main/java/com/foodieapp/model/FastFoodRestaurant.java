@@ -17,5 +17,8 @@ public class FastFoodRestaurant extends Restaurant {
         super(restaurantId, name, cuisineType, location, openingTime, closingTime, menuItems, isActive);
     }
 
-
+    @Override
+    public String toString() {
+        return "FastFoodRestaurant [" + super.toString() + "]";
+    }
 }

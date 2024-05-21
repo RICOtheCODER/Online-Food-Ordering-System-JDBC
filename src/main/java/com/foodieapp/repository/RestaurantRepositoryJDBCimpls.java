@@ -1,5 +1,6 @@
 package com.foodieapp.repository;
 
+import com.foodieapp.model.Customer;
 import com.foodieapp.model.MenuItem;
 import com.foodieapp.model.Restaurant;
 
@@ -48,6 +49,11 @@ public class RestaurantRepositoryJDBCimpls implements RestaurantRepository {
 
     @Override
     public void deactivateRestaurant(long restaurantID) {
+
+    }
+
+    @Override
+    public void addCustomer(Customer customer) throws SQLException {
 
     }
 }

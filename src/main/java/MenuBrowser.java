@@ -1,5 +1,7 @@
 import com.foodieapp.model.CuisineType;
 import com.foodieapp.service.UserRestaurantService;
+
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class  MenuBrowser {
@@ -11,7 +13,7 @@ public class  MenuBrowser {
         sc = new Scanner(System.in);
     }
 
-    public void browseMenus() {
+    public void browseMenus() throws SQLException {
         System.out.println("==== Browse Menus ====");
         System.out.println("1. Search By Location");
         System.out.println("2. Search By Cuisine Type");
@@ -57,7 +59,7 @@ public class  MenuBrowser {
         }
     }
 
-    private void searchByLocation() {
+    private void searchByLocation() throws SQLException {
         System.out.print("Enter Location: ");
         String location = sc.nextLine();
         service.findRestaurantByLocation(location);
